@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1095962688327",
+    "project_id": "eatright-a1fa7",
+    "storage_bucket": "eatright-a1fa7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095962688327:android:3c83d59288757d5c2caa62",
+        "android_client_info": {
+          "package_name": "com.example.eatright"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1095962688327-nm5pquoe3pmteq074tu40nm5durugcuu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcb1UGPQnPyQgD9-Z2UgqnjuAYMT_y2Yc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1095962688327-nm5pquoe3pmteq074tu40nm5durugcuu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
