@@ -1,7 +1,8 @@
+import 'package:eatright/constants/routes.dart' as routes;
+import 'package:eatright/utilities/show_error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
-import '../constants/routes.dart' as routes;
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -70,9 +71,14 @@ class _RegisterViewState extends State<RegisterView> {
                     devtools.log('no user found', level: 1);
                   }
                   await userCredential.user?.updateDisplayName(dname);
-                  print(userCredential);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    routes.loginRoute,
+                    (route) => false,
+                  );
+                  devtools.log('$userCredential');
                 } on FirebaseAuthException catch (err) {
-                  print('encountered error, $err');
+                  await showErrorDialog(context, err.code);
+                  devtools.log('encountered error, $err');
                 }
               },
               child: const Text('Register'),
