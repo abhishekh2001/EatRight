@@ -1,4 +1,9 @@
+import 'package:eatright/cards/replacement_card.dart';
+import 'package:eatright/constants/defaults.dart';
+import 'package:eatright/models/replacement.dart';
+import 'package:eatright/models/user.dart';
 import 'package:eatright/services/auth/auth_service.dart';
+import 'package:eatright/services/data/user_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 import '../constants/routes.dart' as routes;
@@ -13,54 +18,73 @@ class EatRight extends StatefulWidget {
 }
 
 class _EatRightState extends State<EatRight> {
-  String getUserName() {
+  final Replacement replacement = Replacement('Nestle', 'Bru', 14, 10);
+  MinUser? curMinUser;
+
+  Future<void> _getCurMinUser() async {
     final user = AuthService.firebase().currentUser;
-    return user?.displayName ?? 'guest';
+    final minUser = await getMinUserFromUid(uid: user?.uid);
+    print('got minUser: ');
+    print(minUser);
+    setState(() {
+      curMinUser = minUser;
+    });
   }
 
-  String getUserUrl() {
-    final user = AuthService.firebase().currentUser;
-    return user?.photoUrl ?? '';
+  @override
+  void initState() {
+    super.initState();
+    _getCurMinUser();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Eat-Right'),
-          actions: [
-            PopupMenuButton<MenuAction>(onSelected: (value) async {
-              devtools.log('$value');
-              switch (value) {
-                case MenuAction.logout:
-                  final shouldLogout = await showLogOutDialog(context);
-                  devtools.log('should logout: $shouldLogout');
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('Eat-Right'),
+        actions: [
+          PopupMenuButton<MenuAction>(onSelected: (value) async {
+            devtools.log('$value');
+            switch (value) {
+              case MenuAction.logout:
+                final shouldLogout = await showLogOutDialog(context);
+                devtools.log('should logout: $shouldLogout');
 
-                  if (shouldLogout) {
-                    await AuthService.firebase().logOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      routes.loginRoute,
-                      (_) => false,
-                    );
-                  }
-              }
-            }, itemBuilder: (context) {
-              return const [
-                PopupMenuItem<MenuAction>(
-                    value: MenuAction.logout, child: Text('Log out'))
-              ];
-            })
-          ],
-        ),
-        body: Column(
-          children: [
-            const Text('Make the choice!'),
-            Text(getUserName()),
-            CircleAvatar(
-              backgroundImage: NetworkImage(getUserUrl()),
-            )
-          ],
-        ));
+                if (shouldLogout) {
+                  await AuthService.firebase().logOut();
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    routes.loginRoute,
+                    (_) => false,
+                  );
+                }
+            }
+          }, itemBuilder: (context) {
+            return const [
+              PopupMenuItem<MenuAction>(
+                  value: MenuAction.logout, child: Text('Log out'))
+            ];
+          })
+        ],
+      ),
+      body: Column(
+        children: [
+          const Text('Make the choice!'),
+          Text(curMinUser?.displayName ?? 'Anon'),
+          CircleAvatar(
+              backgroundImage:
+                  NetworkImage(curMinUser?.photoUrl ?? defaultProfileUrl)),
+          ReplacementCard(replacement: replacement),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          devtools.log('create new alt');
+        },
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
 

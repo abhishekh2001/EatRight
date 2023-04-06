@@ -1,6 +1,7 @@
 import 'package:eatright/services/auth/auth_user.dart';
 import 'package:eatright/services/auth/auth_provider.dart';
 import 'package:eatright/services/auth/auth_exceptions.dart';
+import 'package:eatright/services/data/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA
     show FirebaseAuth, FirebaseAuthException;
 import 'package:firebase_core/firebase_core.dart';
@@ -22,10 +23,12 @@ class FirebaseAuthProvider implements AuthProvider {
         password: password,
       );
 
-      await userC.user?.updateDisplayName(displayName);
-
-      if (photoUrl != null) {
-        await userC.user?.updatePhotoURL(photoUrl);
+      if (userC.user != null) {
+        createUserDetails(
+          uid: userC.user?.uid ?? '-',
+          displayName: displayName,
+          photoUrl: photoUrl,
+        );
       }
 
       final user = currentUser;
