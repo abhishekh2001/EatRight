@@ -1,7 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:eatright/firebase_options.dart';
+import 'dart:developer' as devtools show log;
+import '../constants/routes.dart' as routes;
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -66,7 +66,9 @@ class _RegisterViewState extends State<RegisterView> {
                     email: email,
                     password: password,
                   );
-                  if (userCredential.user == null) print('no user found');
+                  if (userCredential.user == null) {
+                    devtools.log('no user found', level: 1);
+                  }
                   await userCredential.user?.updateDisplayName(dname);
                   print(userCredential);
                 } on FirebaseAuthException catch (err) {
@@ -77,8 +79,8 @@ class _RegisterViewState extends State<RegisterView> {
             ),
             TextButton(
                 onPressed: () {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/login/', (route) => false);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      routes.loginRoute, (route) => false);
                 },
                 child: const Text('Have an account? Login'))
           ],

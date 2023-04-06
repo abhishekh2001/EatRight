@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+import '../constants/routes.dart' as routes;
 
 enum MenuAction { logout }
 
@@ -27,8 +28,8 @@ class _EatRightState extends State<EatRight> {
 
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/login/', (_) => false);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        routes.loginRoute, (_) => false);
                   }
               }
             }, itemBuilder: (context) {

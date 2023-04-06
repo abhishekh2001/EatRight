@@ -5,21 +5,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+import 'constants/routes.dart' as routes;
 import 'firebase_options.dart';
 // import 'package:eatright/views/register_view.dart'
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MaterialApp(
+  runApp(
+    MaterialApp(
       title: 'Eat Right',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: const HomePage(),
       routes: {
-        '/login/': (context) => const LoginView(),
-        '/register/': (context) => const RegisterView(),
-      }));
+        routes.loginRoute: (context) => const LoginView(),
+        routes.registerRoute: (context) => const RegisterView(),
+        routes.eatrightRoute: (context) => const EatRight(),
+      },
+    ),
+  );
 }
 
 enum MenuAction { logout }

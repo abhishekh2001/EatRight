@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer' as devtools show log;
+import '../constants/routes.dart' as routes;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -55,8 +57,11 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
-                if (userCredential.user == null) print('no user found');
-                print(userCredential);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  routes.eatrightRoute,
+                  (route) => false,
+                );
+                devtools.log('$userCredential');
               } on FirebaseAuthException catch (err) {
                 if (err.code == 'weak-password') {
                   print('weak password');
