@@ -1,8 +1,9 @@
+import 'package:eatright/services/auth/auth_exceptions.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
 import '../constants/routes.dart' as routes;
 import 'package:eatright/utilities/show_error_dialog.dart';
+import '../services/auth/auth_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -53,13 +54,12 @@ class _LoginViewState extends State<LoginView> {
               final password = _password.text;
 
               try {
-                final userCredential =
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                final userCredential = await AuthService.firebase().logIn(
                   email: email,
                   password: password,
                 );
 
-                final user = FirebaseAuth.instance.currentUser;
+                final user = AuthService.firebase().currentUser;
                 if (user != null) {
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     routes.eatrightRoute,
@@ -67,7 +67,7 @@ class _LoginViewState extends State<LoginView> {
                   );
                 }
                 devtools.log('$userCredential');
-              } on FirebaseAuthException catch (err) {
+              } on GenericAuthException catch (err) {
                 await showErrorDialog(context, err.code);
                 devtools.log(err.code);
               }

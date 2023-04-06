@@ -1,8 +1,9 @@
 import 'package:eatright/constants/routes.dart' as routes;
+import 'package:eatright/services/auth/auth_exceptions.dart';
 import 'package:eatright/utilities/show_error_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
+import '../services/auth/auth_service.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -62,21 +63,23 @@ class _RegisterViewState extends State<RegisterView> {
                 final dname = _displayName.text;
 
                 try {
-                  final userCredential = await FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
+                  await AuthService.firebase().createUser(
                     email: email,
                     password: password,
+                    displayName: dname,
                   );
-                  if (userCredential.user == null) {
-                    devtools.log('no user found', level: 1);
+                  final user = AuthService.firebase().currentUser;
+
+                  if (user == null) {
+                    devtools.log('user is null');
+                  } else {
+                    devtools.log(user.displayName);
                   }
-                  await userCredential.user?.updateDisplayName(dname);
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     routes.loginRoute,
                     (route) => false,
                   );
-                  devtools.log('$userCredential');
-                } on FirebaseAuthException catch (err) {
+                } on GenericAuthException catch (err) {
                   await showErrorDialog(context, err.code);
                   devtools.log('encountered error, $err');
                 }

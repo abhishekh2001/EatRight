@@ -14,4 +14,6 @@ abstract class AuthProvider {
     required String password,
     required String displayName,
   });
+
+  Future<void> init();
 }

@@ -1,8 +1,11 @@
 import 'package:eatright/services/auth/auth_provider.dart';
 import 'package:eatright/services/auth/auth_user.dart';
+import 'package:eatright/services/auth/firebase_auth_provider.dart';
 
 class AuthService implements AuthProvider {
   final AuthProvider provider;
+
+  factory AuthService.firebase() => AuthService(FirebaseAuthProvider());
 
   const AuthService(this.provider);
 
@@ -28,4 +31,9 @@ class AuthService implements AuthProvider {
 
   @override
   Future<void> logOut() => provider.logOut();
+
+  @override
+  Future<void> init() async {
+    await provider.init();
+  }
 }

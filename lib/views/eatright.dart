@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:eatright/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 import '../constants/routes.dart' as routes;
@@ -14,7 +14,7 @@ class EatRight extends StatefulWidget {
 
 class _EatRightState extends State<EatRight> {
   String getUserName() {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = AuthService.firebase().currentUser;
     return user?.displayName ?? 'guest';
   }
 
@@ -32,7 +32,7 @@ class _EatRightState extends State<EatRight> {
                   devtools.log('should logout: $shouldLogout');
 
                   if (shouldLogout) {
-                    await FirebaseAuth.instance.signOut();
+                    await AuthService.firebase().logOut();
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       routes.loginRoute,
                       (_) => false,

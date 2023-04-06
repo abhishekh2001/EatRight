@@ -3,6 +3,9 @@ import 'package:eatright/services/auth/auth_provider.dart';
 import 'package:eatright/services/auth/auth_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA
     show FirebaseAuth, FirebaseAuthException;
+import 'package:firebase_core/firebase_core.dart';
+
+import '../../firebase_options.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
@@ -28,9 +31,9 @@ class FirebaseAuthProvider implements AuthProvider {
         throw UserNotLoggedInAuthException();
       }
     } on FA.FirebaseAuthException catch (err) {
-      throw GenericAuthException();
+      throw GenericAuthException(err.code);
     } catch (err) {
-      throw GenericAuthException();
+      throw GenericAuthException('other-error');
     }
   }
 
@@ -63,7 +66,9 @@ class FirebaseAuthProvider implements AuthProvider {
         throw UserNotLoggedInAuthException();
       }
     } on FA.FirebaseAuthException catch (err) {
-      throw GenericAuthException();
+      throw GenericAuthException(err.code);
+    } catch (err) {
+      throw GenericAuthException('other-error');
     }
   }
 
@@ -75,5 +80,12 @@ class FirebaseAuthProvider implements AuthProvider {
     } else {
       throw UserNotLoggedInAuthException();
     }
+  }
+
+  @override
+  Future<void> init() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   }
 }
