@@ -13,6 +13,11 @@ class EatRight extends StatefulWidget {
 }
 
 class _EatRightState extends State<EatRight> {
+  String getUserName() {
+    final user = FirebaseAuth.instance.currentUser;
+    return user?.displayName ?? 'guest';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +34,9 @@ class _EatRightState extends State<EatRight> {
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                        routes.loginRoute, (_) => false);
+                      routes.loginRoute,
+                      (_) => false,
+                    );
                   }
               }
             }, itemBuilder: (context) {
@@ -41,7 +48,10 @@ class _EatRightState extends State<EatRight> {
           ],
         ),
         body: Column(
-          children: [const Text('Make the choice!')],
+          children: [
+            const Text('Make the choice!'),
+            Text(getUserName()),
+          ],
         ));
   }
 }

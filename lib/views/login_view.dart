@@ -58,10 +58,14 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  routes.eatrightRoute,
-                  (route) => false,
-                );
+
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    routes.eatrightRoute,
+                    (route) => false,
+                  );
+                }
                 devtools.log('$userCredential');
               } on FirebaseAuthException catch (err) {
                 await showErrorDialog(context, err.code);
