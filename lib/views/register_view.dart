@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:eatright/constants/routes.dart' as routes;
 import 'package:eatright/services/auth/auth_exceptions.dart';
+import 'package:eatright/services/data/image_service.dart';
 import 'package:eatright/utilities/show_error_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
 import '../services/auth/auth_service.dart';
 
@@ -17,11 +21,16 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _password;
   late final TextEditingController _displayName;
 
+  late File? _imageFile;
+
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
     _displayName = TextEditingController();
+    _imageFile = null;
     super.initState();
   }
 
@@ -31,6 +40,16 @@ class _RegisterViewState extends State<RegisterView> {
     _password.dispose();
     _displayName.dispose();
     super.dispose();
+  }
+
+  Future<void> pickImage() async {
+    devtools.log('picking image... 2');
+    final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedImage != null) {
+        _imageFile = File(pickedImage.path);
+      }
+    });
   }
 
   @override
@@ -45,17 +64,36 @@ class _RegisterViewState extends State<RegisterView> {
                 autocorrect: false,
                 decoration: const InputDecoration(hintText: 'Enter name')),
             TextField(
-                controller: _email,
-                enableSuggestions: false,
-                autocorrect: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(hintText: 'Enter email')),
+              controller: _email,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(hintText: 'Enter email'),
+            ),
             TextField(
-                controller: _password,
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(hintText: 'Enter password')),
+              controller: _password,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(hintText: 'Enter password'),
+            ),
+            const SizedBox(height: 50),
+            CircleAvatar(
+                radius: 56,
+                backgroundColor: Color(0xff476cfb),
+                child: ClipOval(
+                  child: SizedBox(
+                      width: 100.0,
+                      height: 100.0,
+                      child: _imageFile != null
+                          ? Image.file(_imageFile as File, fit: BoxFit.fill)
+                          : Image.network(
+                              'https://i.ytimg.com/vi/Z5CxyeIYSJw/hqdefault.jpg',
+                              fit: BoxFit.fill,
+                            )),
+                )),
+            ElevatedButton(
+                onPressed: pickImage, child: const Text('Pick Image')),
             TextButton(
               onPressed: () async {
                 final email = _email.text;
@@ -63,10 +101,16 @@ class _RegisterViewState extends State<RegisterView> {
                 final dname = _displayName.text;
 
                 try {
+                  String? photoUrl = null;
+                  if (_imageFile != null) {
+                    devtools.log('uploading image ${_imageFile?.path ?? '<>'}');
+                    photoUrl = await uploadImageFileToStorage(_imageFile!);
+                  }
                   await AuthService.firebase().createUser(
                     email: email,
                     password: password,
                     displayName: dname,
+                    photoUrl: photoUrl,
                   );
                   final user = AuthService.firebase().currentUser;
 

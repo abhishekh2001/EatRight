@@ -18,6 +18,11 @@ class _EatRightState extends State<EatRight> {
     return user?.displayName ?? 'guest';
   }
 
+  String getUserUrl() {
+    final user = AuthService.firebase().currentUser;
+    return user?.photoUrl ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +56,9 @@ class _EatRightState extends State<EatRight> {
           children: [
             const Text('Make the choice!'),
             Text(getUserName()),
+            CircleAvatar(
+              backgroundImage: NetworkImage(getUserUrl()),
+            )
           ],
         ));
   }

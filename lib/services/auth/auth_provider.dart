@@ -13,6 +13,7 @@ abstract class AuthProvider {
     required String email,
     required String password,
     required String displayName,
+    String? photoUrl,
   });
 
   Future<void> init();

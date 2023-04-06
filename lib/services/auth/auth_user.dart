@@ -5,9 +5,11 @@ import 'package:flutter/foundation.dart';
 class AuthUser {
   final bool isEmailVerified;
   final String displayName;
-  // final String photoUrl;
+  final String photoUrl;
 
-  const AuthUser(this.isEmailVerified, this.displayName);
-  factory AuthUser.fromFirebase(FA.User user) =>
-      AuthUser(user.emailVerified, user.displayName ?? 'Anon');
+  const AuthUser(this.isEmailVerified, this.displayName, this.photoUrl);
+  factory AuthUser.fromFirebase(FA.User user) => AuthUser(
+      user.emailVerified,
+      user.displayName ?? 'Anon',
+      user.photoURL ?? 'https://i.ytimg.com/vi/Z5CxyeIYSJw/hqdefault.jpg');
 }

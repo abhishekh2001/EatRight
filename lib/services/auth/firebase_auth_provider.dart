@@ -13,6 +13,7 @@ class FirebaseAuthProvider implements AuthProvider {
     required String email,
     required String password,
     required String displayName,
+    String? photoUrl,
   }) async {
     try {
       final userC =
@@ -22,6 +23,10 @@ class FirebaseAuthProvider implements AuthProvider {
       );
 
       await userC.user?.updateDisplayName(displayName);
+
+      if (photoUrl != null) {
+        await userC.user?.updatePhotoURL(photoUrl);
+      }
 
       final user = currentUser;
 
