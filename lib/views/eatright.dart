@@ -1,5 +1,6 @@
 import 'package:eatright/cards/replacement_card.dart';
 import 'package:eatright/constants/defaults.dart';
+import 'package:eatright/models/comment.dart';
 import 'package:eatright/models/replacement.dart';
 import 'package:eatright/models/user.dart';
 import 'package:eatright/services/auth/auth_service.dart';
@@ -41,6 +42,51 @@ class _EatRightState extends State<EatRight> {
     _getCurMinUser();
   }
 
+  void _onTap(List<Comment> comments) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: .2,
+          minChildSize: .1,
+          maxChildSize: .6,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Container(
+              height: null,
+              color: Colors.lightGreen[100],
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: comments.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(comments[index].content),
+                    subtitle: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundImage: NetworkImage(
+                            comments[index].user.photoUrl,
+                          ),
+                        ),
+                        const SizedBox(width: 12.0),
+                        Text(
+                          comments[index].user.displayName,
+                          style: TextStyle(color: Colors.grey[800]),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +125,10 @@ class _EatRightState extends State<EatRight> {
                   ? const Text("loading...")
                   : Column(children: [
                       ...replacements
-                              ?.map((rep) => ReplacementCard(replacement: rep))
+                              ?.map((rep) => ReplacementCard(
+                                    replacement: rep,
+                                    onTap: _onTap,
+                                  ))
                               .toList() ??
                           []
                     ]),

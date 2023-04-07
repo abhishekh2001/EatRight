@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eatright/models/comment.dart';
 import 'package:eatright/models/replacement.dart';
 import 'package:eatright/models/user.dart';
 import 'dart:developer' as devtools show log;
@@ -47,6 +48,21 @@ Future<List<MinUser>> getAllUserCommitsForRep(String repId) async {
   List<MinUser> res = [];
   for (var doc in userSnap.docs) {
     res.add(MinUser.fromJson(doc.data()));
+  }
+
+  return res;
+}
+
+Future<List<Comment>> getAllCommentsOnRep(String repId) async {
+  final commentsRef = FirebaseFirestore.instance.collection('comments');
+  final commentsSnap = await commentsRef.where('repId', isEqualTo: repId).get();
+  final docsList = commentsSnap.docs;
+
+  List<Comment> res = [];
+  for (var docSnap in docsList) {
+    var commentMap = docSnap.data();
+    var comment = await Comment.initFromFirebase(commentMap);
+    res.add(comment);
   }
 
   return res;

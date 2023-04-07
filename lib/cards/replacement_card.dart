@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eatright/models/comment.dart';
 import 'package:eatright/models/replacement.dart';
 import 'package:eatright/services/auth/auth_service.dart';
 import 'package:eatright/services/data/replacement_service.dart';
@@ -8,8 +10,12 @@ import 'package:flutter/material.dart';
 
 class ReplacementCard extends StatefulWidget {
   final Replacement replacement;
-
-  const ReplacementCard({super.key, required this.replacement});
+  final Function(List<Comment>) onTap;
+  const ReplacementCard({
+    super.key,
+    required this.replacement,
+    required this.onTap,
+  });
 
   @override
   State<ReplacementCard> createState() => _ReplacementCardState();
@@ -37,6 +43,11 @@ class _ReplacementCardState extends State<ReplacementCard> {
     devtools
         .log('updating rep state... numComments: ${updatedRep.numComments}');
     return updatedRep;
+  }
+
+  Future<void> _retrieveAndPushCommentToOnTap() async {
+    final comments = await getAllCommentsOnRep(replacement.id);
+    widget.onTap(comments);
   }
 
   Future<void> _submitComment() async {
@@ -120,7 +131,7 @@ class _ReplacementCardState extends State<ReplacementCard> {
                 ),
                 const SizedBox(width: 25),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: _retrieveAndPushCommentToOnTap,
                   child: Text('${replacement.numComments} comments'),
                 ),
               ],
