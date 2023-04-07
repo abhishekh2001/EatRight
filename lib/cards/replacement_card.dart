@@ -7,6 +7,7 @@ import 'package:eatright/services/data/replacement_service.dart';
 import 'package:eatright/services/data/user_service.dart';
 import 'dart:developer' as devtools show log;
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReplacementCard extends StatefulWidget {
   final Replacement replacement;
@@ -197,6 +198,18 @@ class ProductMinDisplay extends StatelessWidget {
   final Map<String, dynamic> product;
   final bool isOld;
 
+  Future<void> _launchUrl() async {
+    String url = product['productUrl'];
+    if (url == '') {
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri)) {
+      throw Exception('Could not launch $uri');
+    }
+  }
+
   const ProductMinDisplay(
       {super.key, required this.product, required this.isOld});
 
@@ -218,8 +231,16 @@ class ProductMinDisplay extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                if (product['productUrl'] != '')
+                  IconButton(
+                    onPressed: _launchUrl,
+                    icon: const Icon(Icons.shop),
+                  ),
                 Text(product['productName']),
-                Icon(isOld ? Icons.cancel : Icons.check)
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(isOld ? Icons.cancel : Icons.check),
+                ),
               ],
             ),
           ],
