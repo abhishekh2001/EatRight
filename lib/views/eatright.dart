@@ -20,19 +20,18 @@ class EatRight extends StatefulWidget {
 
 class _EatRightState extends State<EatRight> {
   MinUser? curMinUser;
+  List<Replacement>? replacements;
 
   Future<void> _getCurMinUser() async {
     final user = AuthService.firebase().currentUser;
     final minUser = await getMinUserFromUid(user?.uid);
-    print('got minUser: ');
-    print(minUser);
+    devtools.log('got minUser: ${minUser.displayName}');
 
-    final r =
-        await getReplacementFromId('aabf6183-1473-4662-8c43-7fa0fbcd3315');
-    devtools.log(
-        '${r.id}, ${r.oldProduct} author display: ${r.author.displayName}');
+    var reps = await getAllReplacementsRec();
+
     setState(() {
       curMinUser = minUser;
+      replacements = reps;
     });
   }
 
@@ -72,15 +71,21 @@ class _EatRightState extends State<EatRight> {
           })
         ],
       ),
-      body: Column(
-        children: [
-          const Text('Make the choice!'),
-          Text(curMinUser?.displayName ?? 'Anon'),
-          CircleAvatar(
-            backgroundImage:
-                NetworkImage(curMinUser?.photoUrl ?? defaultProfileUrl),
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              child: replacements == null
+                  ? const Text("loading...")
+                  : Column(children: [
+                      ...replacements
+                              ?.map((rep) => ReplacementCard(replacement: rep))
+                              .toList() ??
+                          []
+                    ]),
+            )
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

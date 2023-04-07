@@ -26,5 +26,13 @@ Future<Replacement> getReplacementFromId(String id) async {
 }
 
 Future<List<Replacement>> getAllReplacementsRec() async {
-  return [];
+  final querySnap = await FirebaseFirestore.instance.collection('test').get();
+  List<Replacement> res = [];
+  for (final doc in querySnap.docs) {
+    var rep = Replacement.fromJson(doc.data());
+    await rep.loadAuthor();
+    res.add(rep);
+  }
+  devtools.log('loaded ${res.length} replacements');
+  return res;
 }
