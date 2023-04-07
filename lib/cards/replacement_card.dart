@@ -17,7 +17,7 @@ class ReplacementCard extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: Container(
-                    child: Text(replacement.oldProduct),
+                    child: Text('test 1'),
                   ),
                 ),
               ),
@@ -25,7 +25,7 @@ class ReplacementCard extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: Container(
-                    child: Text(replacement.newProduct),
+                    child: Text('test 2'),
                   ),
                 ),
               ),

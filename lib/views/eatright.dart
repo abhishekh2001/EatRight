@@ -18,7 +18,6 @@ class EatRight extends StatefulWidget {
 }
 
 class _EatRightState extends State<EatRight> {
-  final Replacement replacement = Replacement('Nestle', 'Bru', 14, 10);
   MinUser? curMinUser;
 
   Future<void> _getCurMinUser() async {
@@ -72,9 +71,9 @@ class _EatRightState extends State<EatRight> {
           const Text('Make the choice!'),
           Text(curMinUser?.displayName ?? 'Anon'),
           CircleAvatar(
-              backgroundImage:
-                  NetworkImage(curMinUser?.photoUrl ?? defaultProfileUrl)),
-          ReplacementCard(replacement: replacement),
+            backgroundImage:
+                NetworkImage(curMinUser?.photoUrl ?? defaultProfileUrl),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eatright/constants/defaults.dart';
 import 'package:eatright/models/user.dart';
 import 'dart:developer' as devtools show log;
-import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:uuid/uuid.dart';
 
 Future<void> createUserDetails({
   required String uid,
@@ -21,7 +22,7 @@ Future<void> createUserDetails({
   final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
   await docRef.set(userDetails);
 
-  devtools.log('added ${docRef.path}, ${docRef.id}');
+  devtools.log('added userDetails ${docRef.path}, ${docRef.id}');
 }
 
 Future<MinUser> getMinUserFromUid(String? uid) async {
@@ -37,4 +38,17 @@ Future<MinUser> getMinUserFromUid(String? uid) async {
   }
 
   return MinUser('-', 'Anon', defaultProfileUrl);
+}
+
+Future<void> createCommit(String uid, String repId) async {
+  Map<String, dynamic> commitDetails = {
+    'createdAt': FieldValue.serverTimestamp(),
+    'uid': uid,
+    'repId': repId,
+  };
+
+  final commitId = const Uuid().v4();
+  final docRef = FirebaseFirestore.instance.collection('commits').doc(commitId);
+  await docRef.set(commitDetails);
+  devtools.log('added commit ${docRef.path}, ${docRef.id}');
 }

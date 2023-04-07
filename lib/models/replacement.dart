@@ -1,9 +1,11 @@
+import 'package:eatright/models/user.dart';
 import 'package:uuid/uuid.dart';
 
 class Replacement {
   String id;
-  String oldProduct;
-  String newProduct;
+  late MinUser author;
+  Map<String, String?> oldProduct;
+  Map<String, String?> newProduct;
   int numCommits;
   int numComments;
 
@@ -11,8 +13,12 @@ class Replacement {
   List commits;
 
   Replacement(
-      this.oldProduct, this.newProduct, this.numCommits, this.numComments)
-      : id = const Uuid().v4(),
+    this.author,
+    this.oldProduct,
+    this.newProduct,
+    this.numCommits,
+    this.numComments,
+  )   : id = const Uuid().v4(),
         comments = [],
         commits = [];
 

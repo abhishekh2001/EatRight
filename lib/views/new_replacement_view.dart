@@ -1,7 +1,14 @@
 import 'dart:io';
 import 'dart:developer' as devtools show log;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eatright/constants/defaults.dart';
+import 'package:eatright/services/auth/auth_service.dart';
+import 'package:eatright/services/data/image_service.dart';
+import 'package:eatright/services/data/replacement_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class NewReplacementPage extends StatefulWidget {
   const NewReplacementPage({super.key});
@@ -55,17 +62,71 @@ class _NewReplacementPageState extends State<NewReplacementPage> {
     });
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      final currentUser = AuthService.firebase().currentUser;
+      if (currentUser == null) {
+        devtools.log('User is null.');
+        Navigator.of(context).pop();
+      }
       String product1 = _product1Controller.text;
       String product2 = _product2Controller.text;
       String product1Url = _product1urlController.text;
       String product2Url = _product2urlController.text;
 
-      print('Product 1: $product1');
-      print('Product 2: $product2');
-      print('product 1 url: $product1Url');
-      print('Product 2 url: $product2Url');
+      String product1NetUrl = defaultProductUrl;
+      String product2NetUrl = defaultProductUrl;
+
+      if (_prod1ImageFile != null) {
+        product1NetUrl = await uploadImageFileToStorage(
+          _prod1ImageFile as File,
+          'product_images',
+        );
+      }
+
+      if (_prod2ImageFile != null) {
+        product2NetUrl = await uploadImageFileToStorage(
+          _prod2ImageFile as File,
+          'product_images',
+        );
+      }
+
+      Map<String, String> oldProduct = {
+        'productName': product1,
+        'productImageUrl': product1NetUrl,
+        'productUrl': product1Url,
+      };
+
+      Map<String, String> newProduct = {
+        'productName': product2,
+        'productImageUrl': product2NetUrl,
+        'productUrl': product2Url,
+      };
+
+      if (currentUser != null) {
+        final id = Uuid().v4();
+        Map<String, dynamic> replacementData = {
+          'id': id,
+          'uid': currentUser.uid,
+          'oldProduct': oldProduct,
+          'newProdct': newProduct,
+          'numCommits': 0,
+          'numComments': 1,
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+
+        devtools.log('to push replacement data...');
+        await createNewReplacement(replacementData);
+
+        Navigator.of(context).pop();
+      }
+
+      devtools.log('Product 1: $product1');
+      devtools.log('Product 2: $product2');
+      devtools.log('product 1 url: $product1Url');
+      devtools.log('Product 2 url: $product2Url');
+      devtools.log(
+          'image paths: ${_prod1ImageFile?.path}, ${_prod2ImageFile?.path}');
     }
   }
 
@@ -82,61 +143,12 @@ class _NewReplacementPageState extends State<NewReplacementPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text(
-                          'Old product',
-                          style: TextStyle(
-                            fontSize: 17.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _product1Controller,
-                        decoration: const InputDecoration(
-                          labelText: 'Old product name',
-                        ),
-                        validator: (value) {
-                          return productNameValidator(value);
-                        },
-                      ),
-                      TextFormField(
-                        controller: _product1urlController,
-                        decoration: const InputDecoration(
-                          labelText: 'URL',
-                        ),
-                        validator: (value) {
-                          print('url: $value');
-                          if (value != null &&
-                              value.isNotEmpty &&
-                              !isUrl(value)) {
-                            return 'Enter valid URL';
-                          }
-                          return null;
-                        },
-                      ),
-                      Container(
-                        height: 120,
-                        width: 120,
-                        child: _prod1ImageFile == null
-                            ? const Icon(Icons.add_a_photo, color: Colors.grey)
-                            : Image.file(
-                                _prod1ImageFile as File,
-                                fit: BoxFit.contain,
-                              ),
-                      ),
-                      ElevatedButton(
-                          onPressed: pickProd1Image,
-                          child: const Text('Pick Image')),
-                    ],
-                  ),
-                ),
+              ProductInput(
+                title: 'Old product',
+                productController: _product1Controller,
+                producturlController: _product1urlController,
+                pickProdImage: pickProd1Image,
+                prodImageFile: _prod1ImageFile,
               ),
               const SizedBox(height: 16.0),
               ProductInput(

@@ -104,7 +104,10 @@ class _RegisterViewState extends State<RegisterView> {
                   String? photoUrl = null;
                   if (_imageFile != null) {
                     devtools.log('uploading image ${_imageFile?.path ?? '<>'}');
-                    photoUrl = await uploadImageFileToStorage(_imageFile!);
+                    photoUrl = await uploadImageFileToStorage(
+                      _imageFile!,
+                      'profile_images',
+                    );
                   }
                   await AuthService.firebase().createUser(
                     email: email,
