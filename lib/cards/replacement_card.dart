@@ -1,10 +1,61 @@
 import 'package:eatright/models/replacement.dart';
+import 'package:eatright/services/auth/auth_service.dart';
+import 'package:eatright/services/data/replacement_service.dart';
+import 'package:eatright/services/data/user_service.dart';
+import 'dart:developer' as devtools show log;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-class ReplacementCard extends StatelessWidget {
+class ReplacementCard extends StatefulWidget {
   final Replacement replacement;
 
   const ReplacementCard({super.key, required this.replacement});
+
+  @override
+  State<ReplacementCard> createState() => _ReplacementCardState();
+}
+
+class _ReplacementCardState extends State<ReplacementCard> {
+  bool _isCommentInputVisible = false;
+  final _commentController = TextEditingController();
+  late Replacement replacement;
+
+  @override
+  void initState() {
+    super.initState();
+    replacement = widget.replacement;
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  Future<Replacement> _updateCurrentRepState() async {
+    final updatedRep = await getReplacementFromId(replacement.id);
+    devtools
+        .log('updating rep state... numComments: ${updatedRep.numComments}');
+    return updatedRep;
+  }
+
+  Future<void> _submitComment() async {
+    final String content = _commentController.text;
+    final String? uid = AuthService.firebase().currentUser?.uid;
+
+    if (uid != null) {
+      await createCommentOnRep(
+        uid,
+        replacement.id,
+        content,
+      );
+    }
+    Replacement updatedRep = await _updateCurrentRepState();
+    setState(() {
+      _isCommentInputVisible = false;
+      replacement = updatedRep;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +98,11 @@ class ReplacementCard extends StatelessWidget {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      _isCommentInputVisible = true;
+                    });
+                  },
                   child: const Text('Comment'),
                 ),
                 Spacer(),
@@ -70,6 +125,32 @@ class ReplacementCard extends StatelessWidget {
                 ),
               ],
             ),
+            if (_isCommentInputVisible)
+              TextFormField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  labelText: 'Enter some text',
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        // cancel button
+                        onPressed: () {
+                          setState(() {
+                            _isCommentInputVisible = false;
+                          });
+                        },
+                        icon: const Icon(Icons.cancel_rounded),
+                      ),
+                      IconButton(
+                        // submit button
+                        onPressed: _submitComment,
+                        icon: const Icon(Icons.send),
+                      ),
+                    ],
+                  ),
+                ),
+              )
           ],
         ),
       ),

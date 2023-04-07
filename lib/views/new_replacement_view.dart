@@ -104,7 +104,7 @@ class _NewReplacementPageState extends State<NewReplacementPage> {
       };
 
       if (currentUser != null) {
-        final id = Uuid().v4();
+        final id = const Uuid().v4();
         Map<String, dynamic> replacementData = {
           'id': id,
           'uid': currentUser.uid,
