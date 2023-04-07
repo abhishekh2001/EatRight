@@ -1,20 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eatright/models/comment.dart';
 import 'package:eatright/models/replacement.dart';
+import 'package:eatright/models/user.dart';
 import 'package:eatright/services/auth/auth_service.dart';
 import 'package:eatright/services/data/replacement_service.dart';
 import 'package:eatright/services/data/user_service.dart';
 import 'dart:developer' as devtools show log;
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class ReplacementCard extends StatefulWidget {
   final Replacement replacement;
+  final enableCommit;
   final Function(List<Comment>) onTap;
+  final Function(List<MinUser>) onTapCommit;
+  final Function handleUserCommit;
+
   const ReplacementCard({
     super.key,
     required this.replacement,
     required this.onTap,
+    required this.onTapCommit,
+    required this.enableCommit,
+    required this.handleUserCommit,
   });
 
   @override
@@ -23,6 +30,7 @@ class ReplacementCard extends StatefulWidget {
 
 class _ReplacementCardState extends State<ReplacementCard> {
   bool _isCommentInputVisible = false;
+  bool _enableCommit = true;
   final _commentController = TextEditingController();
   late Replacement replacement;
 
@@ -30,6 +38,7 @@ class _ReplacementCardState extends State<ReplacementCard> {
   void initState() {
     super.initState();
     replacement = widget.replacement;
+    _enableCommit = widget.enableCommit;
   }
 
   @override
@@ -48,6 +57,21 @@ class _ReplacementCardState extends State<ReplacementCard> {
   Future<void> _retrieveAndPushCommentToOnTap() async {
     final comments = await getAllCommentsOnRep(replacement.id);
     widget.onTap(comments);
+  }
+
+  Future<void> _retrieveAndPushCommitsToOnTap() async {
+    final users = await getAllUsersCommitedToRep(replacement.id);
+    widget.onTapCommit(users);
+  }
+
+  void _handleCommit() async {
+    await widget.handleUserCommit(replacement.id);
+    final updatedRep = await getReplacementFromId(replacement.id);
+    devtools.log('updated rep, commits: ${updatedRep.numCommits}');
+    setState(() {
+      _enableCommit = false;
+      replacement = updatedRep;
+    });
   }
 
   Future<void> _submitComment() async {
@@ -118,7 +142,7 @@ class _ReplacementCardState extends State<ReplacementCard> {
                 ),
                 Spacer(),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _enableCommit ? _handleCommit : null,
                   child: const Text('Commit!'),
                 ),
               ],
@@ -126,7 +150,7 @@ class _ReplacementCardState extends State<ReplacementCard> {
             Row(
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: _retrieveAndPushCommitsToOnTap,
                   child: Text('${replacement.numCommits} commits'),
                 ),
                 const SizedBox(width: 25),

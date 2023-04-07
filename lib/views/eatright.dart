@@ -26,6 +26,7 @@ class _EatRightState extends State<EatRight> {
   Future<void> _getCurMinUser() async {
     final user = AuthService.firebase().currentUser;
     final minUser = await getMinUserFromUid(user?.uid);
+    await minUser.fillCommits();
     devtools.log('got minUser: ${minUser.displayName}');
 
     var reps = await getAllReplacementsRec();
@@ -36,10 +37,60 @@ class _EatRightState extends State<EatRight> {
     });
   }
 
+  Future<void> _handleUserCommit(String repId) async {
+    if (curMinUser != null) {
+      await createCommitOnRep(curMinUser?.uid ?? '', repId);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _getCurMinUser();
+  }
+
+  void _onTapCommit(List<MinUser> commits) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: .2,
+          minChildSize: .1,
+          maxChildSize: .6,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Container(
+              height: null,
+              color: Colors.lightGreen[100],
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: commits.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundImage: NetworkImage(
+                            commits[index].photoUrl,
+                          ),
+                        ),
+                        const SizedBox(width: 12.0),
+                        Text(
+                          commits[index].displayName,
+                          style: TextStyle(color: Colors.grey[800]),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   void _onTap(List<Comment> comments) {
@@ -128,6 +179,11 @@ class _EatRightState extends State<EatRight> {
                               ?.map((rep) => ReplacementCard(
                                     replacement: rep,
                                     onTap: _onTap,
+                                    onTapCommit: _onTapCommit,
+                                    enableCommit: (curMinUser?.commits
+                                            ?.contains(rep.id) ==
+                                        false),
+                                    handleUserCommit: _handleUserCommit,
                                   ))
                               .toList() ??
                           []

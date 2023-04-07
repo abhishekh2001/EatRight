@@ -50,7 +50,19 @@ Future<void> createCommitOnRep(String uid, String repId) async {
   final commitId = const Uuid().v4();
   final docRef = FirebaseFirestore.instance.collection('commits').doc(commitId);
   await docRef.set(commitDetails);
-  devtools.log('added commit ${docRef.path}, ${docRef.id}');
+
+// update number of commits by +1
+  final repRef = FirebaseFirestore.instance.collection('test').doc(repId);
+  final repSnap = await repRef.get();
+
+  var d = repSnap.data();
+  int? numCommits = d == null ? null : d['numCommits'];
+  if (numCommits != null) {
+    await repRef.update({
+      'numCommits': numCommits + 1,
+    });
+    devtools.log('added commit ${docRef.path}, ${docRef.id}');
+  }
 }
 
 Future<void> createCommentOnRep(
@@ -81,4 +93,35 @@ Future<void> createCommentOnRep(
   } else {
     devtools.log('ERROR: NUMCOMMENTS IS NUL repId: $repId');
   }
+}
+
+Future<Set<String>> getAllRepCommitsByUser(String uid) async {
+  Set<String> repIds = {};
+
+  final commitRefs = FirebaseFirestore.instance
+      .collection('commits')
+      .where('uid', isEqualTo: uid);
+
+  QuerySnapshot<Map<String, dynamic>> querySnapshot = await commitRefs.get();
+  for (var doc in querySnapshot.docs) {
+    repIds.add(doc.data()['repId']);
+  }
+
+  return repIds;
+}
+
+Future<List<MinUser>> getAllUsersCommitedToRep(String repId) async {
+  List<MinUser> users = [];
+
+  final commitRefs = FirebaseFirestore.instance
+      .collection('commits')
+      .where('repId', isEqualTo: repId);
+
+  final querySnapshot = await commitRefs.get();
+  for (var doc in querySnapshot.docs) {
+    final user = await getMinUserFromUid(doc.data()['uid']);
+    users.add(user);
+  }
+
+  return users;
 }
