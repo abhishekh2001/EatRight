@@ -28,7 +28,11 @@ Future<Replacement> getReplacementFromId(String id) async {
 }
 
 Future<List<Replacement>> getAllReplacementsRec() async {
-  final querySnap = await FirebaseFirestore.instance.collection('test').get();
+  var dayInMillis = Duration(days: 1).inMilliseconds;
+  final querySnap = await FirebaseFirestore.instance
+      .collection('test')
+      .orderBy('numCommits', descending: true)
+      .get();
   List<Replacement> res = [];
   for (final doc in querySnap.docs) {
     var rep = Replacement.fromJson(doc.data());

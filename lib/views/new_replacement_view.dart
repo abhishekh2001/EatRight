@@ -110,7 +110,7 @@ class _NewReplacementPageState extends State<NewReplacementPage> {
           'uid': currentUser.uid,
           'oldProduct': oldProduct,
           'newProduct': newProduct,
-          'numCommits': 1,
+          'numCommits': 0,
           'numComments': 0,
           'createdAt': FieldValue.serverTimestamp(),
         };

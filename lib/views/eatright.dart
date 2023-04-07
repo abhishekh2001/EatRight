@@ -37,6 +37,10 @@ class _EatRightState extends State<EatRight> {
     });
   }
 
+  Future<void> onEachStart() async {
+    await _getCurMinUser();
+  }
+
   Future<void> _handleUserCommit(String repId) async {
     if (curMinUser != null) {
       await createCommitOnRep(curMinUser?.uid ?? '', repId);
@@ -195,7 +199,10 @@ class _EatRightState extends State<EatRight> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           devtools.log('create new alt');
-          Navigator.of(context).pushNamed(routes.newReplacementRoute);
+          Navigator.pushNamed(
+            context,
+            routes.newReplacementRoute,
+          );
         },
         backgroundColor: Colors.green,
         child: const Icon(Icons.add),
