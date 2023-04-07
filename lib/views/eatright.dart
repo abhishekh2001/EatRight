@@ -23,7 +23,7 @@ class _EatRightState extends State<EatRight> {
 
   Future<void> _getCurMinUser() async {
     final user = AuthService.firebase().currentUser;
-    final minUser = await getMinUserFromUid(uid: user?.uid);
+    final minUser = await getMinUserFromUid(user?.uid);
     print('got minUser: ');
     print(minUser);
     setState(() {
@@ -80,6 +80,7 @@ class _EatRightState extends State<EatRight> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           devtools.log('create new alt');
+          Navigator.of(context).pushNamed(routes.newReplacementRoute);
         },
         backgroundColor: Colors.green,
         child: const Icon(Icons.add),

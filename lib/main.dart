@@ -1,6 +1,7 @@
 import 'package:eatright/services/auth/auth_service.dart';
 import 'package:eatright/views/eatright.dart';
 import 'package:eatright/views/login_view.dart';
+import 'package:eatright/views/new_replacement_view.dart';
 import 'package:eatright/views/register_view.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
@@ -21,6 +22,7 @@ void main() {
         routes.loginRoute: (context) => const LoginView(),
         routes.registerRoute: (context) => const RegisterView(),
         routes.eatrightRoute: (context) => const EatRight(),
+        routes.newReplacementRoute: (context) => const NewReplacementPage(),
       },
     ),
   );

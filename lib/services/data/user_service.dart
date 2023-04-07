@@ -24,9 +24,7 @@ Future<void> createUserDetails({
   devtools.log('added ${docRef.path}, ${docRef.id}');
 }
 
-Future<MinUser> getMinUserFromUid({
-  String? uid,
-}) async {
+Future<MinUser> getMinUserFromUid(String? uid) async {
   if (uid != null) {
     final userRef = FirebaseFirestore.instance.collection('users').doc(uid);
 
