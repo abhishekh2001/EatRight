@@ -46,21 +46,30 @@ class ReplacementCard extends StatelessWidget {
             const Divider(thickness: 1.5),
             Row(
               children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  child: const Text('Comment'),
+                ),
+                Spacer(),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: const Text('Commit!'),
+                ),
+              ],
+            ),
+            Row(
+              children: [
                 TextButton(
                   onPressed: () {},
                   child: Text('${replacement.numCommits} commits'),
                 ),
+                const SizedBox(width: 25),
                 TextButton(
                   onPressed: () {},
                   child: Text('${replacement.numComments} comments'),
                 ),
-                const Spacer(flex: 1),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('Commit!'),
-                )
               ],
-            )
+            ),
           ],
         ),
       ),

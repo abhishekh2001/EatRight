@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eatright/models/replacement.dart';
+import 'package:eatright/models/user.dart';
 import 'dart:developer' as devtools show log;
 import 'package:eatright/services/data/user_service.dart';
 
@@ -34,5 +35,19 @@ Future<List<Replacement>> getAllReplacementsRec() async {
     res.add(rep);
   }
   devtools.log('loaded ${res.length} replacements');
+  return res;
+}
+
+Future<List<MinUser>> getAllUserCommitsForRep(String repId) async {
+  final userSnap = await FirebaseFirestore.instance
+      .collection('commits')
+      .where('repId', isEqualTo: repId)
+      .get();
+
+  List<MinUser> res = [];
+  for (var doc in userSnap.docs) {
+    res.add(MinUser.fromJson(doc.data()));
+  }
+
   return res;
 }
