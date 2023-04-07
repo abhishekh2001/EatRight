@@ -149,6 +149,13 @@ class _EatRightState extends State<EatRight> {
       appBar: AppBar(
         title: const Text('Eat-Right'),
         actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, routes.eatrightRoute);
+            },
+          ),
           PopupMenuButton<MenuAction>(onSelected: (value) async {
             devtools.log('$value');
             switch (value) {
