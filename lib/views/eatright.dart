@@ -3,6 +3,7 @@ import 'package:eatright/constants/defaults.dart';
 import 'package:eatright/models/replacement.dart';
 import 'package:eatright/models/user.dart';
 import 'package:eatright/services/auth/auth_service.dart';
+import 'package:eatright/services/data/replacement_service.dart';
 import 'package:eatright/services/data/user_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
@@ -25,6 +26,11 @@ class _EatRightState extends State<EatRight> {
     final minUser = await getMinUserFromUid(user?.uid);
     print('got minUser: ');
     print(minUser);
+
+    final r =
+        await getReplacementFromId('aabf6183-1473-4662-8c43-7fa0fbcd3315');
+    devtools.log(
+        '${r.id}, ${r.oldProduct} author display: ${r.author.displayName}');
     setState(() {
       curMinUser = minUser;
     });

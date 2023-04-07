@@ -1,11 +1,13 @@
 import 'package:eatright/models/user.dart';
+import 'package:eatright/services/data/user_service.dart';
 import 'package:uuid/uuid.dart';
 
 class Replacement {
   String id;
+  String uid;
   late MinUser author;
-  Map<String, String?> oldProduct;
-  Map<String, String?> newProduct;
+  Map<String, dynamic>? oldProduct;
+  Map<String, dynamic>? newProduct;
   int numCommits;
   int numComments;
 
@@ -13,6 +15,7 @@ class Replacement {
   List commits;
 
   Replacement(
+    this.uid,
     this.author,
     this.oldProduct,
     this.newProduct,
@@ -22,8 +25,9 @@ class Replacement {
         comments = [],
         commits = [];
 
-  Replacement.fromJson(Map<String, dynamic> m)
+  Replacement.fromJson(Map<String, dynamic?> m)
       : id = m['id'],
+        uid = m['uid'],
         oldProduct = m['oldProduct'],
         newProduct = m['newProduct'],
         numCommits = m['numCommits'],
@@ -31,11 +35,13 @@ class Replacement {
         comments = [],
         commits = [];
 
+  Future<void> loadAuthor() async {
+    author = await getMinUserFromUid(uid);
+  }
+
   Future<void> loadComments() async {}
   Future<void> loadCommits() async {}
 
   Future<void> addAndPushComment() async {}
   Future<void> addAndPushCommit() async {}
-
-  Future<void> pushToFirestore() async {}
 }
