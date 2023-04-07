@@ -18,3 +18,7 @@ samples, guidance on mobile development, and a full API reference.
 ## track
 
 * No e-mail verification
+
+* No live reload
+
+* No "reactive programming"
